@@ -1,0 +1,5 @@
+y x         # the positions of the starting point
+n           # the number of fixed positions
+
+# the next n lines describe each fixed positions. Ex:
+y x v       # y is the axis-y index, x is the axis-x index, v is the value on that position
