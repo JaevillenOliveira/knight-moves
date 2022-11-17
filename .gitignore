@@ -1,0 +1,7 @@
+## Ignoring files without extension
+*
+!*/
+!*.*
+
+## Ignoring vscode files
+.vscode
