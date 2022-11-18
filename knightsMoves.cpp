@@ -5,13 +5,13 @@
 
 using namespace std;
 
-const int boardSize = 5;
-const int totalMovementsN = 9;
-const int labelsCorrectSum = 15;
+// const int boardSize = 5;
+// const int totalMovementsN = 9;
+// const int labelsCorrectSum = 15;
 
-// const int boardSize = 10;
-// const int totalMovementsN = 50;
-// const int labelsCorrectSum = 75;
+const int boardSize = 10;
+const int totalMovementsN = 50;
+const int labelsCorrectSum = 75;
 
 void printBoard(int board [boardSize][boardSize]){
     for(int i = 0; i < boardSize; i++){
@@ -61,9 +61,9 @@ std::stack<std::pair <int, int>> calculatePossibleMoves(int x, int y) {
     int tempX, tempY;
     std::stack<std::pair <int, int>> moves;
     tempX = x + 1;
-    if(tempX <= boardSize){
+    if(tempX < boardSize){
         tempY = y + 2;
-        if(tempY <= boardSize)
+        if(tempY < boardSize)
             moves.push(std::make_pair(tempX, tempY));
         tempY = y - 2;
         if(tempY >= 0)
@@ -73,7 +73,7 @@ std::stack<std::pair <int, int>> calculatePossibleMoves(int x, int y) {
     tempX = x - 1;
     if(tempX >= 0){
         tempY = y + 2;
-        if(tempY <= boardSize)
+        if(tempY < boardSize)
             moves.push(std::make_pair(tempX, tempY));
         tempY = y - 2;
         if(tempY >= 0)
@@ -81,9 +81,9 @@ std::stack<std::pair <int, int>> calculatePossibleMoves(int x, int y) {
     }
 
     tempX = x + 2;
-    if(tempX <= boardSize){
+    if(tempX < boardSize){
         tempY = y + 1;
-        if(tempY <= boardSize)
+        if(tempY < boardSize)
             moves.push(std::make_pair(tempX, tempY));
         tempY = y - 1;
         if(tempY >= 0)
@@ -93,7 +93,7 @@ std::stack<std::pair <int, int>> calculatePossibleMoves(int x, int y) {
     tempX = x - 2;
     if(tempX >= 0){
         tempY = y + 1;
-        if(tempY <= boardSize)
+        if(tempY < boardSize)
             moves.push(std::make_pair(tempX, tempY));
         tempY = y - 1;
         if(tempY >= 0)
