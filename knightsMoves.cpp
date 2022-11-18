@@ -1,11 +1,12 @@
 #include <iostream>
 #include <utility> 
 #include <stack> 
-#include <vector> 
+#include <map> 
 
 using namespace std;
 
 const int boardSize = 10;
+const int totalMovementsN = 50;
 
 void printBoard(int board [boardSize][boardSize]){
     for(int i = 0; i < boardSize; i++){
@@ -74,16 +75,22 @@ std::stack<std::pair <int, int>> calculatePossibleMoves(int x, int y) {
 
 int backtracking(std::pair <int, int> startingPos, std::pair <int, int> curPos, 
                     int nextCount, int board [boardSize][boardSize], 
-                    std::vector<std::pair <int, int>> fixedPositions){
+                    std::map<int, std::pair <int, int>> fixedPositions){
 
-    if(nextCount > 50)
+    if(nextCount > totalMovementsN)
         return 0;
 
     int res, valueOnNewPos;
-    bool foundNextStep;
-    std::pair <int, int> newPos;
-    std::vector<std::pair <int, int>>::iterator it;
+    bool foundNextStep, isFixedEl = false;
+    std::pair <int, int> newPos, fixedPos;
+    std::map<int, std::pair <int, int>>::iterator it;
     std::stack<std::pair <int, int>> moves = calculatePossibleMoves(curPos.first, curPos.second);
+
+    it = fixedPositions.find(nextCount);
+    if (it != fixedPositions.end()){
+        fixedPos = it->second;
+        isFixedEl = true;
+    }
 
     while(!moves.empty()){
         foundNextStep = false;
@@ -94,30 +101,35 @@ int backtracking(std::pair <int, int> startingPos, std::pair <int, int> curPos,
             newPos = moves.top(); // get next move in line
             moves.pop(); // remove from stack
 
-            // get the current value on the aimed position
-            valueOnNewPos = board[newPos.first][newPos.second]; 
-
-            // if the value is 0 means that the kniht never passed there before, so is valid move
             // if the value is the same one as the current count, means that is on the right path, it should skip and go on normally
+            if(isFixedEl){
+                if(fixedPos == newPos)
+                    foundNextStep = true;
+            } else {
+                // get the current value on the aimed position
+                valueOnNewPos = board[newPos.first][newPos.second]; 
+
+                // if the value is 0 means that the knight never passed there before, so is valid move
+                if(valueOnNewPos == 0)
+                    foundNextStep = true;  
+            }
+
             // any other situation describes an invalid move, it should be discarded
-            if(valueOnNewPos == 0 || valueOnNewPos == nextCount)
-                foundNextStep = true;  
-            
         }while(!foundNextStep);
 
         // with a valid move, mark the position with the next count
         board[newPos.first][newPos.second] = nextCount;
-
+        printf("\n New Board \n\n");
+        printBoard(board);
         res = backtracking(startingPos, newPos, nextCount + 1, board, fixedPositions);
 
         if(res == -1){ // got a wrong path
 
             // if its a fixed position the value doesn't change, even if the algorithm fot into a wrong path
-            for (it = fixedPositions.begin() ; it != fixedPositions.end(); ++it){
-                if((*it).first == newPos.first && (*it).second == newPos.second){
-                    return res;
-                }
+            if(isFixedEl){
+                return res;
             }
+            
             // if it's not a fixed position, the value is changed back to zero and a new move will be searched for the current count
             board[newPos.first][newPos.second] = 0; // in case of unsuccessful find reset the movement
         } else{
@@ -130,7 +142,7 @@ int backtracking(std::pair <int, int> startingPos, std::pair <int, int> curPos,
 
 int main (){
     std::pair <int, int> startingPair;
-    std::vector <std::pair <int, int>> fixedPositions;
+    std::map <int, std::pair <int, int>> fixedPositions;
     int tempX, tempY, pieceValue, numFilledPositions, res;
 
     int board [boardSize][boardSize] = {};
@@ -146,7 +158,7 @@ int main (){
         cin >> tempY;
         cin >> pieceValue;
         board[tempX][tempY] = pieceValue;
-        fixedPositions.push_back(std::make_pair(tempX, tempY));
+        fixedPositions[pieceValue] = std::make_pair(tempX, tempY);
     }
     printf("\nStarting Board\n\n");
     printBoard(board);
