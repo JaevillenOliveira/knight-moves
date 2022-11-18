@@ -18,6 +18,25 @@ void printBoard(int board [boardSize][boardSize]){
     }
 }
 
+void printLabelsSum(std::map<int, int> labelsSum){
+    for (std::map<int,int>::iterator it = labelsSum.begin(); it != labelsSum.end(); ++it){
+        printf("Label %d: %d\n", it->first, it->second);
+    }
+}
+
+std::map<int, int> calculateLabelsSum(int board [boardSize][boardSize], 
+                            int labels [boardSize][boardSize] ){
+
+    std::map<int, int> labelsSum;
+    for(int i = 0; i < boardSize; i++){
+        for(int j = 0; j < boardSize; j++){
+            labelsSum[labels[i][j]] += board[i][j];
+        }
+    }
+
+    return labelsSum;
+}
+
 /* 
     params: 
         - boardSize: is the max index of the board (ex. in a 10x10 board the max is 9)
@@ -119,8 +138,8 @@ int backtracking(std::pair <int, int> startingPos, std::pair <int, int> curPos,
 
         // with a valid move, mark the position with the next count
         board[newPos.first][newPos.second] = nextCount;
-        printf("\n New Board \n\n");
-        printBoard(board);
+        // printf("\n New Board \n\n");
+        // printBoard(board);
 
         if(backwards){
             if(nextCount - 1 > 0)
@@ -152,9 +171,11 @@ int backtracking(std::pair <int, int> startingPos, std::pair <int, int> curPos,
 int main (){
     std::pair <int, int> startingPair;
     std::map <int, std::pair <int, int>> fixedPositions;
-    int tempX, tempY, pieceValue, numFilledPositions, res, startingCount;
+    std::map <int, int> labelsSum;
+    int tempX, tempY, pieceValue, numFilledPositions, res, startingCount, numLabels;
 
     int board [boardSize][boardSize] = {};
+    int labels [boardSize][boardSize] = {};
 
     cin >> tempX;
     cin >> tempY;
@@ -169,8 +190,25 @@ int main (){
         board[tempX][tempY] = pieceValue;
         fixedPositions[pieceValue] = std::make_pair(tempX, tempY);
     }
+
+    cin >> numLabels;
+    for(int i = 0; i < boardSize; i++){
+        for(int j = 0; j < boardSize; j++){
+            cin >> pieceValue;
+            labels[i][j] = pieceValue;
+        }
+    }
+
+    labelsSum = calculateLabelsSum(board, labels);
+
+    printf("\nLabels Board\n\n");
+    printBoard(labels);
+
     printf("\nStarting Board\n\n");
     printBoard(board);
+
+    printf("\nLabels Sum\n\n");
+    printLabelsSum(labelsSum);
     
     startingCount = board[startingPair.first][startingPair.second];
     res = backtracking(startingPair, startingPair, (startingCount > 1 ? true : false),
