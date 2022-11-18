@@ -5,9 +5,13 @@
 
 using namespace std;
 
-const int boardSize = 10;
-const int totalMovementsN = 50;
-const int labelsCorrectSum = 75;
+const int boardSize = 5;
+const int totalMovementsN = 9;
+const int labelsCorrectSum = 15;
+
+// const int boardSize = 10;
+// const int totalMovementsN = 50;
+// const int labelsCorrectSum = 75;
 
 void printBoard(int board [boardSize][boardSize]){
     for(int i = 0; i < boardSize; i++){
@@ -27,7 +31,7 @@ void printLabelsSum(std::map<int, int> labelsSum){
 
 void calculateLabelsSum(int board [boardSize][boardSize], 
                             int labels [boardSize][boardSize], std::map<int, int> &labelsSum ){
-
+    labelsSum.clear();
     for(int i = 0; i < boardSize; i++){
         for(int j = 0; j < boardSize; j++){
             labelsSum[labels[i][j]] += board[i][j];
@@ -163,6 +167,7 @@ int backtracking(std::pair <int, int> startingPos, std::pair <int, int> curPos,
 
 
         if(res == -1){ // got a wrong path
+            printf("\nRolling Back\n\n");
             // if its a fixed position the value doesn't change, even if the algorithm fot into a wrong path
             if(isFixedEl){
                 return res;
@@ -171,6 +176,12 @@ int backtracking(std::pair <int, int> startingPos, std::pair <int, int> curPos,
             // if it's not a fixed position, the value is changed back to zero and a new move will be searched for the current count
             board[newPos.first][newPos.second] = 0; // in case of unsuccessful find reset the movement
             calculateLabelsSum(board, labels, labelsSum);
+
+            printf("\n Rolled back Board \n\n");
+            printBoard(board);
+
+            printf("\n Rolled back Labels Sum\n\n");
+            printLabelsSum(labelsSum);
         } else{
             return res; // in case of successful find
         }
