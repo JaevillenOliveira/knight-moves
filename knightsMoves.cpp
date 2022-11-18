@@ -5,13 +5,13 @@
 
 using namespace std;
 
-// const int boardSize = 5;
-// const int totalMovementsN = 9;
-// const int labelsCorrectSum = 15;
+const int boardSize = 5;
+const int totalMovementsN = 9;
+const int labelsCorrectSum = 15;
 
-const int boardSize = 10;
-const int totalMovementsN = 50;
-const int labelsCorrectSum = 75;
+// const int boardSize = 10;
+// const int totalMovementsN = 50;
+// const int labelsCorrectSum = 75;
 
 void printBoard(int board [boardSize][boardSize]){
     for(int i = 0; i < boardSize; i++){
@@ -190,6 +190,22 @@ int backtracking(std::pair <int, int> startingPos, std::pair <int, int> curPos,
 }
 
 
+int result(int board [boardSize][boardSize]){
+    int result = 0;
+    int maxLine = 0;
+    for(int i = 0; i < boardSize; i++){
+        for(int j = 0; j < boardSize; j++){
+            if(board[i][j] > maxLine ){
+                maxLine = board[i][j];
+            }
+        }
+        result += maxLine*maxLine;
+        maxLine = 0;
+    }
+    return result;
+}
+
+
 int main (){
     std::pair <int, int> startingPair;
     std::map <int, std::pair <int, int>> fixedPositions;
@@ -244,5 +260,6 @@ int main (){
         printBoard(board);
     }
 
+    cout << "\n\n Result: " << result(board) << "\n";
 
 }
