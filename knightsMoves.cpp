@@ -7,6 +7,7 @@ using namespace std;
 
 const int boardSize = 10;
 const int totalMovementsN = 50;
+const int labelsCorrectSum = 75;
 
 void printBoard(int board [boardSize][boardSize]){
     for(int i = 0; i < boardSize; i++){
@@ -24,17 +25,23 @@ void printLabelsSum(std::map<int, int> labelsSum){
     }
 }
 
-std::map<int, int> calculateLabelsSum(int board [boardSize][boardSize], 
-                            int labels [boardSize][boardSize] ){
+void calculateLabelsSum(int board [boardSize][boardSize], 
+                            int labels [boardSize][boardSize], std::map<int, int> &labelsSum ){
 
-    std::map<int, int> labelsSum;
     for(int i = 0; i < boardSize; i++){
         for(int j = 0; j < boardSize; j++){
             labelsSum[labels[i][j]] += board[i][j];
         }
     }
+}
 
-    return labelsSum;
+bool updateLabelsSum(std::map<int, int> &labelsSum, int labels [boardSize][boardSize], std::pair <int, int> pos, int count){
+    int label = labels[pos.first][pos.second];
+    if(labelsSum[label] + count > labelsCorrectSum)
+        return false;
+
+    labelsSum[label] += count;
+    return true;
 }
 
 /* 
@@ -94,9 +101,10 @@ std::stack<std::pair <int, int>> calculatePossibleMoves(int x, int y) {
 
 int backtracking(std::pair <int, int> startingPos, std::pair <int, int> curPos, 
                     bool backwards, int nextCount, int board [boardSize][boardSize], 
-                    std::map<int, std::pair <int, int>> fixedPositions){
+                    std::map<int, std::pair <int, int>> fixedPositions,
+                    std::map<int, int> &labelsSum, int labels [boardSize][boardSize]){
 
-    if(nextCount > totalMovementsN)
+    if(nextCount > totalMovementsN) // found a valid path
         return 0;
 
     int res, valueOnNewPos;
@@ -129,7 +137,7 @@ int backtracking(std::pair <int, int> startingPos, std::pair <int, int> curPos,
                 valueOnNewPos = board[newPos.first][newPos.second]; 
 
                 // if the value is 0 means that the knight never passed there before, so is valid move
-                if(valueOnNewPos == 0)
+                if(valueOnNewPos == 0 && updateLabelsSum(labelsSum, labels, newPos, nextCount))
                     foundNextStep = true;  
             }
 
@@ -138,21 +146,23 @@ int backtracking(std::pair <int, int> startingPos, std::pair <int, int> curPos,
 
         // with a valid move, mark the position with the next count
         board[newPos.first][newPos.second] = nextCount;
-        // printf("\n New Board \n\n");
-        // printBoard(board);
+        printf("\n New Board \n\n");
+        printBoard(board);
+
+        printf("\nLabels Sum\n\n");
+        printLabelsSum(labelsSum);
 
         if(backwards){
             if(nextCount - 1 > 0)
-                res = backtracking(startingPos, newPos, true, nextCount - 1, board, fixedPositions);
+                res = backtracking(startingPos, newPos, true, nextCount - 1, board, fixedPositions, labelsSum, labels);
             else
-                res = backtracking(startingPos, startingPos, false, board[startingPos.first][startingPos.second] + 1, board, fixedPositions);
+                res = backtracking(startingPos, startingPos, false, board[startingPos.first][startingPos.second] + 1, board, fixedPositions, labelsSum, labels);
         }else{
-            res = backtracking(startingPos, newPos, false, nextCount + 1, board, fixedPositions);
+            res = backtracking(startingPos, newPos, false, nextCount + 1, board, fixedPositions, labelsSum, labels);
         }
 
 
         if(res == -1){ // got a wrong path
-
             // if its a fixed position the value doesn't change, even if the algorithm fot into a wrong path
             if(isFixedEl){
                 return res;
@@ -160,6 +170,7 @@ int backtracking(std::pair <int, int> startingPos, std::pair <int, int> curPos,
             
             // if it's not a fixed position, the value is changed back to zero and a new move will be searched for the current count
             board[newPos.first][newPos.second] = 0; // in case of unsuccessful find reset the movement
+            calculateLabelsSum(board, labels, labelsSum);
         } else{
             return res; // in case of successful find
         }
@@ -199,7 +210,7 @@ int main (){
         }
     }
 
-    labelsSum = calculateLabelsSum(board, labels);
+    calculateLabelsSum(board, labels, labelsSum);
 
     printf("\nLabels Board\n\n");
     printBoard(labels);
@@ -212,7 +223,8 @@ int main (){
     
     startingCount = board[startingPair.first][startingPair.second];
     res = backtracking(startingPair, startingPair, (startingCount > 1 ? true : false),
-                (startingCount > 1 ? startingCount - 1 : startingCount + 1), board, fixedPositions);
+                (startingCount > 1 ? startingCount - 1 : startingCount + 1), board, fixedPositions,
+                labelsSum, labels);
 
     if(res == -1)
         printf("\nPath couldn't be found\n");
