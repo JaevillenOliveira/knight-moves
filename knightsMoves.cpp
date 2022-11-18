@@ -11,7 +11,7 @@ const int totalMovementsN = 50;
 void printBoard(int board [boardSize][boardSize]){
     for(int i = 0; i < boardSize; i++){
         for(int j = 0; j < boardSize; j++){
-            printf("%d ", board[i][j]);
+            printf("%02d ", board[i][j]);
 
         }
         printf("\n");
