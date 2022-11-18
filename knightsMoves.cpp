@@ -74,7 +74,7 @@ std::stack<std::pair <int, int>> calculatePossibleMoves(int x, int y) {
 }
 
 int backtracking(std::pair <int, int> startingPos, std::pair <int, int> curPos, 
-                    int nextCount, int board [boardSize][boardSize], 
+                    bool backwards, int nextCount, int board [boardSize][boardSize], 
                     std::map<int, std::pair <int, int>> fixedPositions){
 
     if(nextCount > totalMovementsN)
@@ -121,7 +121,16 @@ int backtracking(std::pair <int, int> startingPos, std::pair <int, int> curPos,
         board[newPos.first][newPos.second] = nextCount;
         printf("\n New Board \n\n");
         printBoard(board);
-        res = backtracking(startingPos, newPos, nextCount + 1, board, fixedPositions);
+
+        if(backwards){
+            if(nextCount - 1 > 0)
+                res = backtracking(startingPos, newPos, true, nextCount - 1, board, fixedPositions);
+            else
+                res = backtracking(startingPos, startingPos, false, board[startingPos.first][startingPos.second] + 1, board, fixedPositions);
+        }else{
+            res = backtracking(startingPos, newPos, false, nextCount + 1, board, fixedPositions);
+        }
+
 
         if(res == -1){ // got a wrong path
 
@@ -143,7 +152,7 @@ int backtracking(std::pair <int, int> startingPos, std::pair <int, int> curPos,
 int main (){
     std::pair <int, int> startingPair;
     std::map <int, std::pair <int, int>> fixedPositions;
-    int tempX, tempY, pieceValue, numFilledPositions, res;
+    int tempX, tempY, pieceValue, numFilledPositions, res, startingCount;
 
     int board [boardSize][boardSize] = {};
 
@@ -163,8 +172,9 @@ int main (){
     printf("\nStarting Board\n\n");
     printBoard(board);
     
-    res = backtracking(startingPair, startingPair, 
-                board[startingPair.first][startingPair.second] + 1, board, fixedPositions);
+    startingCount = board[startingPair.first][startingPair.second];
+    res = backtracking(startingPair, startingPair, (startingCount > 1 ? true : false),
+                (startingCount > 1 ? startingCount - 1 : startingCount + 1), board, fixedPositions);
 
     if(res == -1)
         printf("\nPath couldn't be found\n");
